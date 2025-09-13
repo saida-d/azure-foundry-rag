@@ -94,7 +94,7 @@ def format_user_query(user_query: str) -> str:
 ### Langchain (traditional approach)
 ###### Can level up with Azure AI Foundry compare to traditional approach (e.g.)
 
-```
+```python
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
