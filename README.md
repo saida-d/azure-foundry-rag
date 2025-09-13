@@ -91,6 +91,60 @@ def format_user_query(user_query: str) -> str:
 - Uses retrieved context + formatted query for RAG-based response.  
 
 ---
+### Langchain (traditional approach)
+###### Can level up with Azure AI Foundry compare to traditional approach (e.g.)
+
+```
+
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA
+from langchain.document_loaders import PyPDFLoader, TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+# Initialize OpenAI Embeddings (or) Huggingface Embeddings
+api_key="YOUR_OPEN_API_KEY"
+embedding_model= OpenAIEmbeddings(api_key=api_key,model="text-embedding-ada-002")
+
+# Load a PDF file or text file
+# Use TextLoader("example.txt") for text files
+document=PyPDFLoader("SOME_IMPORTANT_FILE.pdf")
+docs= document.load()
+
+# Split text into manageable chunks for FAISS
+#doc_splitter= RecursiveCharacterTextSplitter(chunk_size=500,, separators=["\n","\n\n","\r","."] )
+doc_splitter= RecursiveCharacterTextSplitter(chunk_size=500)
+
+# For .txt text use doc_splitter.split_text(splitText)
+doc_splits= doc_splitter.split_documents(docs)
+
+# Convert text chunks to vector embeddings & store in FAISS
+vector_db= FAISS.from_documents(doc_splits,embedding_model)
+
+# Save FAISS index for later use
+vector_db.save_local("faiss_index")
+
+# Initialize OpenAI GPT-x Model
+llm= ChatOpenAI(api_key=api_key, model="gpt-3.5-turbo-0125")
+
+
+# Setup Retrieval-Augmented Generation (RAG) Chain
+qa_chain= RetrievalQA.from_chain_type(llm=llm, retriever=vector_db.as_retriever())
+
+# user query 
+query="What is total emission"
+response=qa_chain.run(query)
+
+# (or) Interactive query/answer
+while True:
+    question=input("You:")
+    bot=qa_chain.invoke(input={'question':question})
+    print('Bot:',bot)
+
+```
+---
+
 
 ## Running the Workflow
 
