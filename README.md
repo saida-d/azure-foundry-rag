@@ -1,5 +1,5 @@
 
-# 📄 Template Standard Flow – RAG with Azure AI Foundry
+# RAG with Azure AI Foundry (and Azure AI Search)
 
 This repository contains a **PromptFlow workflow** built in **Azure AI Foundry** that implements **RAG (Retrieval-Augmented Generation)** using:  
 - **Azure OpenAI embeddings (`text-embedding-ada-002`)**  
@@ -10,7 +10,7 @@ This repository contains a **PromptFlow workflow** built in **Azure AI Foundry**
 ### Author : SAIDA.D
 ---
 
-## 📌 Overview
+## Overview
 
 The flow performs:  
 1. **Format Query** → A Python tool cleans and normalizes user input.  
@@ -20,7 +20,7 @@ The flow performs:
 
 ---
 
-## ⚙️ Inputs & Outputs
+## Inputs & Outputs
 
 ### Inputs
 | Name        | Type   | Description |
@@ -56,7 +56,7 @@ The flow performs:
 
 ---
 
-## 🛠️ Components
+## Components
 
 ### 🔹 1. `format_user_query` (Python Tool)
 This is a **PromptFlow tool** implemented in Python.  
@@ -65,12 +65,14 @@ It strips whitespace and normalizes casing so queries are clean before embedding
 ```python
 from promptflow import tool
 
+
 @tool
 def format_user_query(user_query: str) -> str:
     """
     Clean and normalize user query.
     - Trim whitespace
     - Capitalize first letter
+	- Works as tool where you can customize as per requirement
     """
     return user_query.strip().capitalize()
 ```
@@ -90,7 +92,7 @@ def format_user_query(user_query: str) -> str:
 
 ---
 
-## 🚀 Running the Workflow
+## Running the Workflow
 
 ### 1. Clone Repository
 ```bash
@@ -122,7 +124,7 @@ pf flow test   --flow flow.dag.yaml   --inputs user_query="What are the benefits
 
 ---
 
-## 📊 Workflow Architecture
+## Workflow Architecture
 
 ```mermaid
 flowchart LR
@@ -134,7 +136,7 @@ flowchart LR
 
 ---
 
-## 📖 References
+## References
 - [Azure AI Foundry](https://learn.microsoft.com/en-us/azure/ai-studio/)  
 - [PromptFlow SDK](https://learn.microsoft.com/en-us/azure/ai-studio/concepts/prompt-flow)  
 - [Azure Cognitive Search](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search)  
