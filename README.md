@@ -91,8 +91,7 @@ def format_user_query(user_query: str) -> str:
 - Uses retrieved context + formatted query for RAG-based response.  
 
 ---
-### Langchain (traditional approach)
-###### Can level up with Azure AI Foundry compare to traditional approach (e.g.)
+### RAG + Langchain (traditional approach - before Azure AI Foundry) 
 
 ```python
 
