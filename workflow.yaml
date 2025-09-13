@@ -1,0 +1,81 @@
+id: template_standard_flow
+name: Template Standard Flow
+inputs:
+  user_query:
+    type: string
+    is_chat_input: false
+outputs:
+  response:
+    type: string
+    reference: ${llm.output}
+  python_response:
+    type: string
+    reference: ${format_user_query.output}
+nodes:
+- name: format_user_query
+  type: python
+  source:
+    type: code
+    path: format_user_query.py
+  inputs:
+    user_query: ${inputs.user_query}
+  use_variants: false
+- name: query_index
+  type: python
+  source:
+    type: package
+    tool: promptflow_vectordb.tool.common_index_lookup.search
+  inputs:
+    mlindex_content: >
+      embeddings:
+        api_base: https://reserch-agent-resource.openai.azure.com/
+        api_type: azure
+        api_version: 2023-07-01-preview
+        batch_size: '1'
+        connection:
+          id: /subscriptions/0d046bc4-0c5d-4d3a-9e11-9c7f4b0954e1/resourceGroups/rg-foundry/providers/Microsoft.MachineLearningServices/workspaces/aihubproject/connections/reserch-agent-resource_aoai
+        connection_type: workspace_connection
+        deployment: text-embedding-ada-002
+        dimension: 1536
+        kind: open_ai
+        model: text-embedding-ada-002
+        schema_version: '2'
+      index:
+        api_version: 2024-05-01-preview
+        connection:
+          id: /subscriptions/0d046bc4-0c5d-4d3a-9e11-9c7f4b0954e1/resourceGroups/rg-foundry/providers/Microsoft.MachineLearningServices/workspaces/aihubproject/connections/aihubsearchindex
+        connection_type: workspace_connection
+        endpoint: https://aihubsearchindex.search.windows.net/
+        engine: azure-sdk
+        field_mapping:
+          content: content
+          embedding: null
+          metadata: meta_json_string
+        index: witty-arm-b6s85gxpks
+        kind: acs
+        semantic_configuration_name: azureml-default
+    queries: ${inputs.user_query}
+    query_type: Keyword
+    top_k: 3
+  use_variants: false
+- name: llm
+  type: llm
+  source:
+    type: code
+    path: llm.jinja2
+  inputs:
+    deployment_name: gpt-4.1
+    temperature: 1
+    top_p: 1
+    response_format:
+      type: text
+    indexed_query: ${query_index.output}
+    question: ${format_user_query.output}
+  provider: AzureOpenAI
+  connection: reserch-agent-resource_aoai
+  api: chat
+  module: promptflow.tools.aoai
+  use_variants: false
+node_variants: {}
+environment:
+  python_requirements_txt: requirements.txt
